@@ -1,7 +1,10 @@
 import os
 import argparse
 import queries
+from time import time
 
+
+timenow = time()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--debug",
@@ -12,5 +15,6 @@ parser.add_argument("--sparql-endpoint",
 
 @app.route('/containers')
 def main():
-    containers = queries.list_container_events()
+    print(timenow)
+    containers = queries.list_container_events(timenow)
     return containers

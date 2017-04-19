@@ -21,7 +21,7 @@ def get_triple_value(data, predicate):
     return value[0]['o']['value']
 
 
-def list_container_events():
+def list_container_events(date_from):
     """
     Queries the database for all new events (after current timestamp) and returns
     a JSON object with the data.
@@ -33,9 +33,11 @@ def list_container_events():
     my_query += "?dockevent dockevent:type dockevent_type:container .\n"
     my_query += "?dockevent dockevent:action dockevent_action:start .\n"
     my_query += "?dockevent dockevent:container ?curl .\n"
+    my_query += "?dockevent dockevent:time ?time .\n"
     my_query += "?curl dockcontainer:name ?cname .\n"
     my_query += "?curl dockcontainer:network ?cnetwork .\n"
     my_query += "?cnetwork ?p ?o .\n"
+    my_query += "FILTER (?time > \"%s\"^^<http://www.w3.org/2001/XMLSchema#int>)\n" % int(round(date_from))
     my_query += "} order by ?cname \n"
 
     result = query(my_query)
@@ -53,7 +55,5 @@ def list_container_events():
             }
         }
         custom_result.append(custom_dict)
-
-    print(custom_result)
 
     return json.dumps(custom_result)
