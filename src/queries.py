@@ -31,9 +31,18 @@ def write_json_into_file(data):
     """
     Writes json data into a given file.
     """
-    with open(os.environ['WRITE_FILE'], "ab") as f:
-        for item in data:
-            json.dump(item, f)
+    filename = os.environ['WRITE_DIR'] + os.environ['WRITE_FILE']
+    if not os.path.exists(os.path.dirname(filename)):
+        try:
+            os.makedirs(os.path.dirname(filename))
+        except OSError as exc: # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+
+    with open(filename, "w") as f:
+        json.dump(data, f, indent=2, encoding='utf8')
+        f.write('\n')
+        f.truncate()
 
 
 def list_container_events(date_from):
