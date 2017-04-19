@@ -2,6 +2,7 @@ from helpers import log, query
 from time import sleep
 from itertools import groupby, ifilter
 import json
+import os
 
 
 def prefix():
@@ -17,8 +18,22 @@ def prefix():
 
 
 def get_triple_value(data, predicate):
-    value = filter(lambda item: predicate in item['p']['value'], data)
-    return value[0]['o']['value']
+    """
+    Returns the value associated with a predicate in the result in json format
+    from the triplestore.
+    """
+    values = filter(lambda item: predicate in item['p']['value'], data)
+    most_recent = max(values, key=lambda x: x['time']['value'])
+    return most_recent['o']['value']
+
+
+def write_json_into_file(data):
+    """
+    Writes json data into a given file.
+    """
+    with open(os.environ['WRITE_FILE'], "ab") as f:
+        for item in data:
+            json.dump(item, f)
 
 
 def list_container_events(date_from):
@@ -27,7 +42,7 @@ def list_container_events(date_from):
     a JSON object with the data.
     """
     my_query = prefix()
-    my_query += "select distinct ?cname ?p ?o\n"
+    my_query += "select distinct ?time ?cname ?p ?o\n"
     my_query += "where {\n"
     my_query += "?dockevent a dockevent_type:event .\n"
     my_query += "?dockevent dockevent:type dockevent_type:container .\n"
@@ -56,4 +71,4 @@ def list_container_events(date_from):
         }
         custom_result.append(custom_dict)
 
-    return json.dumps(custom_result)
+    return custom_result
