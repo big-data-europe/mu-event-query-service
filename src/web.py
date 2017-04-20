@@ -2,6 +2,7 @@ import os
 import queries
 import json
 import signal
+import docker
 import sys
 from time import time, sleep
 from helpers import log
@@ -20,7 +21,20 @@ def signal_handler(signal, frame):
         pass
     sys.exit(0)
 
+def is_db_up():
+    client = docker.from_env()
+    database = filter(lambda cl: 'database' in cl.name, client.containers.list())[0]
+    if database.status == 'running':
+        return True
+    else:
+        return Falses
+
 def main_loop():
+    while not is_db_up():
+        log("[+] db not available")
+        sleep(2)
+        continue
+
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
