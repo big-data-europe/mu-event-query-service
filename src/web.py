@@ -2,10 +2,11 @@ import os
 import queries
 import json
 import signal
-import docker
+import urllib2
 import sys
 from time import time, sleep
 from helpers import log
+
 
 timenow = time()
 
@@ -22,12 +23,12 @@ def signal_handler(signal, frame):
     sys.exit(0)
 
 def is_db_up():
-    client = docker.from_env()
-    database = filter(lambda cl: 'database' in cl.name, client.containers.list())[0]
-    if database.status == 'running':
+    try:
+        urllib2.urlopen(os.environ['MU_SPARQL_ENDPOINT'], timeout=1)
         return True
-    else:
-        return Falses
+    except urllib2.URLError as err:
+        return False
+
 
 def main_loop():
     while not is_db_up():
