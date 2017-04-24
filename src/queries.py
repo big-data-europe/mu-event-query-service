@@ -58,7 +58,7 @@ def list_container_events(date_from):
     my_query += "?dockevent dockevent:action dockevent_action:start .\n"
     my_query += "?dockevent dockevent:container ?curl .\n"
     my_query += "?dockevent dockevent:time ?time .\n"
-    my_query += "?curl dockcontainer:label \"logging=true\"^^<http://www.w3.org/2001/XMLSchema#string> .\n"
+    my_query += "?curl dockcontainer:label \"logging=true\" .\n"
     my_query += "?curl dockcontainer:name ?cname .\n"
     my_query += "?curl dockcontainer:network ?cnetwork .\n"
     my_query += "?cnetwork ?p ?o .\n"
