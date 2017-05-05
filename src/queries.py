@@ -23,8 +23,14 @@ def get_triple_value(data, predicate):
     from the triplestore.
     """
     values = filter(lambda item: predicate in item['p']['value'], data)
-    most_recent = max(values, key=lambda x: x['time']['value'])
-    return most_recent['o']['value']
+
+    # A container may have several links
+    if predicate == "link":
+        links = [el['o']['value'] for el in values]
+        return { el.split(':')[0]: el.split(':')[1] for el in links }
+    else:
+        most_recent = max(values, key=lambda x: x['time']['value'])
+        return most_recent['o']['value']
 
 
 def write_json_into_file(data):
@@ -71,14 +77,16 @@ def list_container_events(date_from):
 
     for key, items in groupby(result['results']['bindings'], lambda x: x['cname']['value']):
         list_items = list(items)
-        custom_dict = {
-            'name': key.replace("/",""),
-            'data': {
-                'ipAddress': get_triple_value(list_items, 'network/ipAddress'),
-                'interface_id': get_triple_value(list_items, 'network/id'),
-                'network_name': get_triple_value(list_items, 'network/name')
+        if list_items:
+            custom_dict = {
+                'name': key.replace("/",""),
+                'data': {
+                    'ipAddress': get_triple_value(list_items, 'network/ipAddress'),
+                    'interface_id': get_triple_value(list_items, 'network/id'),
+                    'network_name': get_triple_value(list_items, 'network/name')
+                },
+                'links': get_triple_value(list_items, 'link')
             }
-        }
-        custom_result.append(custom_dict)
+            custom_result.append(custom_dict)
 
     return custom_result
