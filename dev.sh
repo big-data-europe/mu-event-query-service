@@ -6,6 +6,6 @@ docker run --rm -it \
            -p 1234:80 \
            --link etmsplatform_db_1:database \
            --network etmsplatform_default \
-           --name mu-docker-event-query \
+           --name mu-event-query-service \
            -e MODE=development \
-           mu-docker-event-query
+           mu-event-query-service
